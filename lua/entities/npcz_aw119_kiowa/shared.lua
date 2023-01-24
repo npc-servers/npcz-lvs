@@ -6,53 +6,81 @@ ENT.Author = "NPCZ"
 ENT.Category = "[LVS] NPCZ Aircraft"
 ENT.Spawnable = true
 ENT.MDL = "models/models/helis/aw119_kiowa/aw119_kiowa.mdl"
--- ENT.AITEAM = 2
--- ENT.Inertia = Vector( 5000, 5000, 5000 )
--- ENT.Drag = 0
--- ENT.SeatPos = Vector( 49.173, 18.594, -80.958 )
--- ENT.SeatAng = Angle( 0, -90, 0 )
--- ENT.IdleRPM = 500
--- ENT.MaxRPM = 3000
--- ENT.LimitRPM = 3000
--- ENT.MaxThrustHeli = 10.2
--- ENT.MaxTurnPitchHeli = 30
--- ENT.MaxTurnYawHeli = 80
--- ENT.MaxTurnRollHeli = 120
--- ENT.ThrustEfficiencyHeli = 4
--- ENT.RotorPos = Vector( 0, 0, 27.826 )
--- ENT.RotorAngle = Angle( 0, 0, 0 )
--- ENT.RotorRadius = 280
--- ENT.MaxHealth = 2000
--- ENT.MaxPrimaryAmmo = 3000
--- ENT.MaxSecondaryAmmo = 14
+
+ENT.MaxVelocity = 2150
+
+ENT.ThrustUp = 1
+ENT.ThrustDown = 0.8
+ENT.ThrustRate = 1
+
+ENT.ThrottleRateUp = 0.2
+ENT.ThrottleRateDown = 0.2
+
+ENT.TurnRatePitch = 1
+ENT.TurnRateYaw = 1
+ENT.TurnRateRoll = 1
+
+ENT.ForceLinearDampingMultiplier = 1.5
+ENT.ForceAngleMultiplier = 1
+
+ENT.EngineSounds = {
+    {
+        sound = "^lvs/vehicles/helicopter/loop_near.wav",
+        sound_int = "lvs/vehicles/helicopter/loop_interior.wav",
+        Pitch = 0,
+        PitchMin = 0,
+        PitchMax = 255,
+        PitchMul = 100,
+        Volume = 1,
+        VolumeMin = 0,
+        VolumeMax = 1,
+        SoundLevel = 125,
+        UseDoppler = true,
+    },
+    {
+        sound = "^lvs/vehicles/helicopter/loop_dist.wav",
+        sound_int = "",
+        Pitch = 0,
+        PitchMin = 0,
+        PitchMax = 255,
+        PitchMul = 100,
+        Volume = 1,
+        VolumeMin = 0,
+        VolumeMax = 1,
+        SoundLevel = 125,
+        UseDoppler = true,
+    },
+}
+
+-- CONFIG
+-- https://github.com/Blu-x92/lvs_helicopters/blob/03dff59e23/lua/entities/lvs_base_helicopter/shared.lua#L1-L28
 
 -- https://github.com/Blu-x92/lvs_base/blob/73a3df0e0df2de433fce2ebc533157e5ed545026/lua/entities/lvs_base/sh_weapons.lua#L22
-local gunTable = LVS:GetWeaponPreset( "LMG" )
-gunTable.Ammo = 3000
-gunTable.Delay = 0
-gunTable.Damage = 10
+ENT.gunTable = {
+    Ammo = 3000,
+    Delay = 0,
+    Icon = Material( "lvs/weapons/mg.png" )
+}
 
-local gunPosLocal = Vector( 20.02, 47.291, -84.527 )
-
-function gunTable.StartAttack( ent )
+function ENT.gunTable.StartAttack( ent )
     ent.GunSound = ent:StartLoopingSound( "reiktek_industries_kiowa/aw119_kiowa/kiowa_gun.wav" )
     ent:ResetSequence( "minigunspin" )
 end
 
-function gunTable.FinishAttack( ent )
+function ENT.gunTable.FinishAttack( ent )
     ent:StopLoopingSound( ent.GunSound )
     ent:ResetSequence( "idle" )
     ent:EmitSound( "reiktek_industries_kiowa/aw119_kiowa/brr_stop.wav" )
 end
 
-function gunTable.Attack( ent )
+function ENT.gunTable.Attack( ent )
     -- https://github.com/Blu-x92/lvs_base/blob/73a3df0e0df2de433fce2ebc533157e5ed545026/lua/lvs_framework/autorun/lvs_bulletsystem.lua#L183
-    local gunPos = ent:LocalToWorld( gunPosLocal )
+    local gunPos = ent:LocalToWorld( Vector( 20.02, 47.291, -82 ) )
     local bulletTable = {
-        Velocity = 1000,
+        Velocity = 20000,
         Dir = ent:GetForward(),
         Src = gunPos,
-        Spread = Vector( 0.05, 0.05, 0.05 ),
+        Spread = Vector( 0.025, 0.025, 0.025 ),
         Entity = ent,
         TracerName = "lvs_tracer_yellow",
         HullSize = 3
@@ -68,6 +96,33 @@ function gunTable.Attack( ent )
     ent:TakeAmmo()
 end
 
+
+ENT.rocketTable = {
+    Ammo = 30,
+    Delay = 1,
+    Icon = Material( "lvs/weapons/missile.png" )
+}
+
+function ENT.rocketTable.Attack( ent )
+    local driver = ent:GetDriver()
+    local rocket = ents.Create( "lvs_missile" )
+    rocket:SetPos( ent:LocalToWorld( Vector( -9.683, -56.04, -85.209 ) ) )
+    rocket:SetAngles( ent:GetAngles() )
+    rocket:SetParent( ent )
+    rocket:Spawn()
+    rocket:Activate()
+    rocket:SetAttacker( IsValid( driver ) and driver or ent )
+    rocket:SetEntityFilter( ent:GetCrosshairFilterEnts() )
+    rocket:SetSpeed( ent:GetVelocity():Length() + 5000 )
+    rocket:SetDamage( 400 )
+    rocket:SetRadius( 150 )
+    rocket:Enable()
+    rocket:EmitSound( "npc/waste_scanner/grenade_fire.wav" )
+
+    ent:TakeAmmo()
+end
+
 function ENT:InitWeapons()
-    self:AddWeapon( gunTable )
+    self:AddWeapon( self.gunTable )
+    self:AddWeapon( self.rocketTable )
 end

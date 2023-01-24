@@ -38,6 +38,21 @@ function ENT:OnSpawn()
         rotor:EmitSound( "physics/metal/metal_box_break2.wav" )
     end
 
+    function self.Rotor:CheckRotorClearance()
+        if self:GetDisabled() then self:DeleteRotorWash() return end
+
+        local base = self:GetBase()
+
+        if not IsValid( base ) then self:DeleteRotorWash() return end
+
+        if not base:GetEngineActive() then self:DeleteRotorWash() return end
+        if base:GetThrottle() > 0.5 then
+            self:CreateRotorWash()
+        else
+            self:DeleteRotorWash()
+        end
+    end
+
     self.TailRotor = self:AddRotor( Vector( -300, 15, -25 ), Angle( 0, 0, 90 ), 55, 4000 )
     self.TailRotor:SetHP( 30 )
     function self.TailRotor:OnDestroyed( rotor )
@@ -48,6 +63,8 @@ function ENT:OnSpawn()
     end
 
     self.Engine = self:AddEngineSound( Vector( 0, 0, -20 ) )
+
+    self:SetSkin( math.random( 0, 15 ) ) -- random skin
 end
 
 function ENT:OnEngineActiveChanged( active )
