@@ -46,61 +46,11 @@ function ENT:OnSpawn()
         rotor:EmitSound( "physics/metal/metal_box_break2.wav" )
         rotor:DestroySteering( -2.5 )
     end
+
+    self.Engine = self:AddEngineSound( Vector( 0, 0, -20 ) )
 end
 
--- function ENT:HandleWeapons( Fire1, Fire2 )
---     local Driver = self:GetDriver()
-
---     if IsValid( Driver ) then
---         if self:GetAmmoPrimary() > 0 then
---             Fire1 = Driver:KeyDown( IN_ATTACK )
---         end
-
---         if self:GetAmmoSecondary() > 0 then
---             Fire2 = Driver:KeyDown( IN_ATTACK2 )
---         end
---     end
-
---     if Fire1 then
---         self:PrimaryAttack()
---         self:ResetSequence( "minigunspin" )
---     else
---         self:ResetSequence( "idle" )
---     end
-
---     if self.OldFire2 ~= Fire2 then
---         if Fire2 then
---             self:SecondaryAttack()
---         end
-
---         self.OldFire2 = Fire2
---     end
-
---     if self.OldFire ~= Fire1 then
---         if Fire1 then
---             self.wpn1 = CreateSound( self, "reiktek_industries_kiowa/aw119_kiowa/kiowa_gun.wav" )
---             self.wpn1:Play()
-
---             self:CallOnRemove( "stopmesounds1", function( ent )
---                 if ent.wpn1 then
---                     ent.wpn1:Stop()
---                 end
---             end )
---         else
---             if self.OldFire == true then
---                 if self.wpn1 then
---                     self.wpn1:Stop()
---                 end
-
---                 self.wpn1 = nil
---                 self:EmitSound( "reiktek_industries_kiowa/aw119_kiowa/kiowa_gun_stop_final.wav" )
---             end
---         end
-
---         self.OldFire = Fire1
---     end
--- end
-
--- function ENT:OnEngineStartInitialized()
---     self:EmitSound( "reiktek_industries_kiowa/aw119_kiowa/chopper_start.wav" )
--- end
+function ENT:OnEngineActiveChanged( active )
+    if not active then return end
+    self.Engine:EmitSound( "lvs/vehicles/helicopter/start.wav" )
+end
