@@ -1,0 +1,27 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\helis\aw119_kiowa\mainbody13"
+               "$bumpmap" "models\helis\aw119_kiowa\AW119_mainbody_n"
+
+	$phong						1
+	$phongexponent				100
+	$phongboost					0.1
+	$phongfresnelranges             "[.5 4 6]"
+        $rimmask					"1"
+        $rimlightexponent			"80"	
+	$rimlight					"1"
+	$rimlightboost		".25"
+            $phongalbedotint			"0"
+        $phongalbedoboost 		"100"
+
+
+"Proxies"
+{
+"AnimatedTexture"
+{
+"animatedTextureVar" "$basetexture"
+"animatedTextureFrameNumVar" "$frame"
+"animatedTextureFrameRate" "10"
+}
+}
+}

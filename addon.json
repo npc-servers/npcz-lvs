@@ -1,0 +1,12 @@
+{
+  "title": "[LFS] AW-119 Kiowa",
+  "type": "vehicle",
+  "tags": [
+    "fun",
+    "roleplay",
+    "realism"
+  ],
+  "ignore": [
+    "*.txt"
+  ]
+}
